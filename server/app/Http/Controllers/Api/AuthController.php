@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -19,7 +21,6 @@ class AuthController extends Controller
                 'number' => 'required|string|unique:users,number',
                 'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'password' => 'required|string|min:6|confirmed',
-                'role' => 'required|in:user,admin,super admin',
             ]);
     
             $imageName = time() . '.' . $request->image->extension();
