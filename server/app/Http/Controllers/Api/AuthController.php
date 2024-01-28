@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -31,43 +34,30 @@ class AuthController extends Controller
                 'role' => $request->role,
             ]);
     
-            return response()->json(['user' => $user, 'message' => 'User registered successfully'], 201);
+            $token = JWTAuth::fromUser($user);
+
+            return response()->json(['user' => $user, 'token' => $token], 201);
         
        }catch(\Exception $e){
         return response()->json(['error' => $e->getMessage()], 500);
        }
     }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+
+        if (!Auth::attempt($credentials)) {
+            return response()->json(['error' => 'Invalid credentials'], 401);
+        }
+
+        $user = Auth::user();
+        $token = JWTAuth::fromUser($user);
+
+        return response()->json(['user' => $user, 'token' => $token], 200);
+    }
+
     
 }
-// public function register(Request $request)
-//     {
-//         $request->validate([
-//             'name' => 'required|string',
-//             'email' => 'required|email|unique:users',
-//             // 'password' => 'required|string|min:6',
-//             'number' => ['required', 'string', 'unique:users'],
-//             'image' => ['nullable', 'image', 'max:2048'], // Assuming a maximum image size of 2 MB
-//             'password' => ['required', 'string', 'min:8', 'confirmed'],
-//             'role' => ['string', 'in:user,admin,super admin'], // Adjust roles as needed
-//         ]);
-        
-//         $imagePath = null;
 
-//         if (isset($request['image'])) {
-//             $imagePath = $request['image']->store('profile_images', 'public');
-//         }
-
-//         $user = User::create([
-//             'name' => $request->name,
-//             'email' => $request->email,
-//             'password' => Hash::make($request->password),
-//             'image' => $imagePath,
-//             'number' => $request->email,
-//             'role' => $request->email,  
-//         ]);
-
-//         $token = $user->createToken('authToken')->accessToken;
-
-//         return response()->json(['token' => $token], 201);
-//     }
     
