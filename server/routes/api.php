@@ -14,8 +14,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::group(['middleware' => 'auth'], function () {
+    // Admin routes
+    Route::group(['middleware' => 'role:admin,super admin '], function () {
+        
+    });
+
+    // Super Admin routes
+    Route::group(['middleware' => 'role:super admin'], function () {
+        
+    });
+
+    // User routes
+    Route::group(['middleware' => 'role:user'], function () {
+         
+    });
 });
 
 Route::post('/register', [AuthController::class, 'register']);
